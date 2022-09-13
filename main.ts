@@ -31,6 +31,7 @@ async function createWindow () {
     if (process.argv[1] !== ".") {
         let fileContents = fs.readFileSync(process.argv[1]).toString()
         let fileJSON = JSON.parse(fileContents)
+        currentNoteFilePath = process.argv[1]
 
         win.webContents.send("file-contents", fileJSON.content)
     }

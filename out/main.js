@@ -67,6 +67,7 @@ function createWindow() {
                     if (process.argv[1] !== ".") {
                         fileContents = fs.readFileSync(process.argv[1]).toString();
                         fileJSON = JSON.parse(fileContents);
+                        currentNoteFilePath = process.argv[1];
                         win.webContents.send("file-contents", fileJSON.content);
                     }
                     return [2 /*return*/, win];
