@@ -2,35 +2,23 @@ import {app, BrowserWindow, dialog} from 'electron'
 import * as express from "express";
 import * as electron from 'electron'
 import {export_docx, export_pdf} from './src/exporter'
-import {writeFileSync} from "fs";
+import {writeFileSync, readFileSync} from "fs";
+import * as fs from "fs";
 
 const IPCMain = electron.ipcMain
-const Port = 2342 || process.env.PORT
 const path = require('path')
-const server = express()
 
-server.listen(Port, () => {
-    console.log("Listening to "+Port)
-})
+let currentNoteFilePath
 
-
-server.get("/editor", (req, res) => {
-    res.sendFile(path.join(__dirname, '/views/index.html'))
-})
-
-server.get("/renderer.js", (req, res) => {
-    res.sendFile(path.join(__dirname, '/views/renderer.js'))
-})
-
-function createWindow () {
+async function createWindow () {
     const win = new BrowserWindow({
-        width: 800,
-        height: 600,
+        minWidth: 800,
+        minHeight: 600,
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
             nodeIntegration: true,
             contextIsolation: false,
-            devTools: false,
+            // devTools: false,
         }
 
     })
@@ -38,16 +26,23 @@ function createWindow () {
     win.menuBarVisible = false
 
 
-    win.loadURL("http://localhost:2342/editor")
+    await win.loadURL(path.join(__dirname, "/views/index.html"))
+
+    if (process.argv[1] !== ".") {
+        let fileContents = fs.readFileSync(process.argv[1]).toString()
+        let fileJSON = JSON.parse(fileContents)
+
+        win.webContents.send("file-contents", fileJSON.content)
+    }
+    return win
 }
 
-app.whenReady().then(() => {
-    createWindow()
+
+app.whenReady().then(async () => {
+    await createWindow()
 
     app.on('activate', () => {
-        if (BrowserWindow.getAllWindows().length === 0) {
-            createWindow()
-        }
+        createWindow()
     })
 })
 
@@ -99,4 +94,67 @@ IPCMain.on("export_docx", async (event, args) => {
             dialog.showErrorBox("Error", reason.toString())
         })
 
+})
+
+IPCMain.on("save-note-file", (event, args) => {
+    let options = {
+
+        //Placeholder 3
+        filters :[
+            {name: 'Note', extensions: ['note']},
+            {name: 'All Files', extensions: ['*']}
+        ]
+    }
+
+    if (args.new_save || !currentNoteFilePath) {
+        dialog.showSaveDialog(BrowserWindow.getFocusedWindow(), options)
+            .then(async (value) => {
+                if (!value.canceled) {
+                    currentNoteFilePath = value.filePath
+                    writeFileSync(value.filePath, JSON.stringify({
+                        content: args.content || ""
+                    }))
+                }
+            })
+            .catch(reason => {
+                dialog.showErrorBox("Error", reason.toString())
+            })
+    }
+    else {
+        writeFileSync(currentNoteFilePath, JSON.stringify({
+            content: args.content || ""
+        }))
+    }
+
+})
+
+IPCMain.handle("icons", (event, args) => {
+    return require("./icons.json")
+})
+
+IPCMain.handle("open-note-file", (event, args) => {
+    let options: electron.OpenDialogOptions = {
+
+        //Placeholder 3
+        filters :[
+            {name: 'Note', extensions: ['note']},
+        ],
+        properties: [
+            "openFile",
+        ]
+    }
+
+    return dialog.showOpenDialog(BrowserWindow.getFocusedWindow(), options)
+        .then(async (value) => {
+            if (!value.canceled) {
+
+                currentNoteFilePath = value.filePaths[0]
+                let contents = JSON.parse(readFileSync(value.filePaths[0]).toString())
+
+                return (contents.content)
+            }
+        })
+        .catch(reason => {
+            dialog.showErrorBox("Error", reason.toString())
+        })
 })
