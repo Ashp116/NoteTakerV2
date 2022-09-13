@@ -1,7 +1,6 @@
 {
   "name": "notetaker",
   "version": "1.0.1",
-  "description": "",
   "main": "./out/main.js",
   "scripts": {
     "test": "nodemon --watch . --exec \"electron .\"",
@@ -28,17 +27,36 @@
     "electron-builder": "^23.3.3"
   },
   "build": {
-    "appId": "come.test.ashp116",
+    "appId": "com.electron.NoteTaker",
+    "extraMetadata": {
+      "name": "Note Taker",
+      "description": "A personal project, created to better the author's knowledge on electronJS",
+      "projectUrl": "https://github.com/Ashp116/NoteTakerV2#readme",
+      "license": "MIT",
+      "author": "Ashp116",
+      "repository": "https://github.com/Ashp116/NoteTakerV2"
+    },
+    "productName": "Note Taker",
     "win": {
       "target": "nsis",
       "icon": "build/icon.ico"
     },
+    "copyright": "Copyright ©2022 Ashp116}",
     "fileAssociations": [
       {
         "ext": "note",
         "name": "Note Taker",
-        "role": "Notebook"
+        "role": "Notebook",
+        "icon": "build/note-file.ico"
       }
     ]
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ashp116/NoteTakerV2.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Ashp116/NoteTakerV2/issues"
+  },
+  "homepage": "https://github.com/Ashp116/NoteTakerV2#readme"
 }
