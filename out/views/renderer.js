@@ -1,5 +1,4 @@
 const {ipcRenderer} = require('electron')
-const {each} = require("tinymce");
 const ipc  = ipcRenderer
 
 let initFileContent = ""
@@ -14,7 +13,7 @@ ipc.invoke("icons")
 let configTinyMCE = {
     selector: 'textarea',
     theme_advanced_resizing : false,
-    height: "97vh",
+    height: "99.9vh",
     resize: false,
     promotion: false,
     plugins: [
@@ -97,6 +96,7 @@ let configTinyMCE = {
 
         editor.ui.registry.addMenuItem('open', {
             text: 'Open Note',
+            icon: "open_doc",
             onAction: function() {
                 ipc.invoke("open-note-file", "")
                     .then(content => tinymce.activeEditor.setContent(content))
@@ -245,4 +245,26 @@ document.onkeydown = (event) => {
             content: tinymce.activeEditor.getContent()
         })
     }
+}
+
+let db = false
+
+window.onbeforeunload = (e) => {
+    if (db) return
+
+    db = true
+
+    // Unlike usual browsers that a message box will be prompted to users, returning
+    // a non-void value will silently cancel the close.
+    // It is recommended to use the dialog API to let the user confirm closing the
+    // application.
+    e.returnValue = false
+    ipc.invoke("closing-window", {
+        new_save: false,
+        content: tinymce.activeEditor.getContent()
+    }).then((success) => {
+        if (success) {
+            window.close()
+        }
+    })
 }

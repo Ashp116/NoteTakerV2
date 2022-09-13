@@ -44,9 +44,53 @@ var fs = require("fs");
 var IPCMain = electron.ipcMain;
 var path = require('path');
 var currentNoteFilePath;
+function saveNoteFile(args) {
+    return __awaiter(this, void 0, void 0, function () {
+        var options;
+        var _this = this;
+        return __generator(this, function (_a) {
+            options = {
+                //Placeholder 3
+                filters: [
+                    { name: 'Note', extensions: ['note'] },
+                    { name: 'All Files', extensions: ['*'] }
+                ]
+            };
+            if (args.new_save || !currentNoteFilePath) {
+                return [2 /*return*/, electron_1.dialog.showSaveDialog(electron_1.BrowserWindow.getFocusedWindow(), options)
+                        .then(function (value) { return __awaiter(_this, void 0, void 0, function () {
+                        return __generator(this, function (_a) {
+                            if (!value.canceled) {
+                                currentNoteFilePath = value.filePath;
+                                (0, fs_1.writeFileSync)(value.filePath, JSON.stringify({
+                                    content: args.content || ""
+                                }));
+                                return [2 /*return*/, true];
+                            }
+                            else {
+                                return [2 /*return*/, false];
+                            }
+                            return [2 /*return*/];
+                        });
+                    }); })
+                        .catch(function (reason) {
+                        electron_1.dialog.showErrorBox("Error", reason.toString());
+                    })];
+            }
+            else {
+                (0, fs_1.writeFileSync)(currentNoteFilePath, JSON.stringify({
+                    content: args.content || ""
+                }));
+                return [2 /*return*/, true];
+            }
+            return [2 /*return*/];
+        });
+    });
+}
 function createWindow() {
     return __awaiter(this, void 0, void 0, function () {
         var win, fileContents, fileJSON;
+        var _this = this;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -70,6 +114,16 @@ function createWindow() {
                         currentNoteFilePath = process.argv[1];
                         win.webContents.send("file-contents", fileJSON.content);
                     }
+                    IPCMain.handle("closing-window", function (event, args) { return __awaiter(_this, void 0, void 0, function () {
+                        return __generator(this, function (_a) {
+                            switch (_a.label) {
+                                case 0: return [4 /*yield*/, saveNoteFile(args).then(function (res) {
+                                        return res;
+                                    })];
+                                case 1: return [2 /*return*/, (_a.sent())];
+                            }
+                        });
+                    }); });
                     return [2 /*return*/, win];
             }
         });
@@ -157,35 +211,7 @@ IPCMain.on("export_docx", function (event, args) { return __awaiter(void 0, void
     });
 }); });
 IPCMain.on("save-note-file", function (event, args) {
-    var options = {
-        //Placeholder 3
-        filters: [
-            { name: 'Note', extensions: ['note'] },
-            { name: 'All Files', extensions: ['*'] }
-        ]
-    };
-    if (args.new_save || !currentNoteFilePath) {
-        electron_1.dialog.showSaveDialog(electron_1.BrowserWindow.getFocusedWindow(), options)
-            .then(function (value) { return __awaiter(void 0, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                if (!value.canceled) {
-                    currentNoteFilePath = value.filePath;
-                    (0, fs_1.writeFileSync)(value.filePath, JSON.stringify({
-                        content: args.content || ""
-                    }));
-                }
-                return [2 /*return*/];
-            });
-        }); })
-            .catch(function (reason) {
-            electron_1.dialog.showErrorBox("Error", reason.toString());
-        });
-    }
-    else {
-        (0, fs_1.writeFileSync)(currentNoteFilePath, JSON.stringify({
-            content: args.content || ""
-        }));
-    }
+    saveNoteFile(args);
 });
 IPCMain.handle("icons", function (event, args) {
     return require("./icons.json");
