@@ -24,7 +24,7 @@ This is the first release of the author's first electron app. This app is a ligh
 
 ## License
 
-This project is licensed under the [NAME HERE] License - see the LICENSE.md file for details
+This project is licensed under the MIT License - see the LICENSE.md file for details
 
 ## Acknowledgments
 
