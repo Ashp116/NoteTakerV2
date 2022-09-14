@@ -10,6 +10,44 @@ const path = require('path')
 
 let currentNoteFilePath
 
+async function saveNoteFile(args) {
+    let options = {
+
+        //Placeholder 3
+        filters :[
+            {name: 'Note', extensions: ['note']},
+            {name: 'All Files', extensions: ['*']}
+        ]
+    }
+
+    if (args.new_save || !currentNoteFilePath) {
+        return dialog.showSaveDialog(BrowserWindow.getFocusedWindow(), options)
+            .then(async (value) => {
+                if (!value.canceled) {
+                    currentNoteFilePath = value.filePath
+                    writeFileSync(value.filePath, JSON.stringify({
+                        content: args.content || ""
+                    }))
+
+                    return true
+                }
+                else {
+                   return false
+                }
+            })
+            .catch(reason => {
+                dialog.showErrorBox("Error", reason.toString())
+            })
+    }
+    else {
+        writeFileSync(currentNoteFilePath, JSON.stringify({
+            content: args.content || ""
+        }))
+
+        return true
+    }
+}
+
 async function createWindow () {
     const win = new BrowserWindow({
         minWidth: 800,
@@ -35,6 +73,12 @@ async function createWindow () {
 
         win.webContents.send("file-contents", fileJSON.content)
     }
+
+    IPCMain.handle("closing-window", async (event, args) => {
+        return ( await saveNoteFile(args).then(res => {
+            return res
+        }))
+    })
     return win
 }
 
@@ -98,35 +142,7 @@ IPCMain.on("export_docx", async (event, args) => {
 })
 
 IPCMain.on("save-note-file", (event, args) => {
-    let options = {
-
-        //Placeholder 3
-        filters :[
-            {name: 'Note', extensions: ['note']},
-            {name: 'All Files', extensions: ['*']}
-        ]
-    }
-
-    if (args.new_save || !currentNoteFilePath) {
-        dialog.showSaveDialog(BrowserWindow.getFocusedWindow(), options)
-            .then(async (value) => {
-                if (!value.canceled) {
-                    currentNoteFilePath = value.filePath
-                    writeFileSync(value.filePath, JSON.stringify({
-                        content: args.content || ""
-                    }))
-                }
-            })
-            .catch(reason => {
-                dialog.showErrorBox("Error", reason.toString())
-            })
-    }
-    else {
-        writeFileSync(currentNoteFilePath, JSON.stringify({
-            content: args.content || ""
-        }))
-    }
-
+    saveNoteFile(args)
 })
 
 IPCMain.handle("icons", (event, args) => {
