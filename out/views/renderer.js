@@ -22,7 +22,7 @@ let configTinyMCE = {
         "searchreplace", "table", "visualblocks", "slashcommands", "imagetools", 
         "wordcount", "emoticons", "imagetools"
     ],
-    toolbar: "undo redo | styles | bold italic underline strikethrough | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image",
+    toolbar: "undo redo | styles | bold italic underline strikethrough removeformat | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image",
     editor: "restore_draft",
     toolbar_mode: 'floating',
     automatic_uploads: true,
@@ -113,20 +113,32 @@ let configTinyMCE = {
 
         editor.on('keydown', function (event) {
             if (event.code === "KeyS" && event.ctrlKey) {
-                console.log('KeyS Ctrl')
                 ipc.send("save-note-file", {
                     new_save: false,
                     content: tinymce.activeEditor.getContent()
                 })
             }
             if (event.code === "KeyS" && event.ctrlKey && event.shiftKey) {
-                console.log('KeyS Ctrl Shift')
                 ipc.send("save-note-file", {
                     new_save: true,
                     content: tinymce.activeEditor.getContent()
                 })
             }
         });
+
+        function getSelectionText() {
+            var text = "";
+            if (window.getSelection) {
+                text = window.getSelection().toString();
+            } else if (document.selection && document.selection.type != "Control") {
+                text = document.selection.createRange().text;
+            }
+            return text;
+        }
+
+        document.onmouseup = document.onkeyup = document.onselectionchange = function() {
+            document.getElementById("sel").value = getSelectionText();
+        };
     },
     branding: false,
 
@@ -268,3 +280,4 @@ window.onbeforeunload = (e) => {
         }
     })
 }
+

@@ -66,7 +66,8 @@ async function createWindow () {
 
     await win.loadURL(path.join(__dirname, "/views/index.html"))
 
-    if (process.argv[1] !== ".") {
+    if (process.argv[1] && process.argv[1] !== ".") {
+        console.log(process.argv)
         let fileContents = fs.readFileSync(process.argv[1]).toString()
         let fileJSON = JSON.parse(fileContents)
         currentNoteFilePath = process.argv[1]

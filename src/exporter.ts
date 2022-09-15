@@ -1,12 +1,13 @@
 import {writeFileSync} from "fs";
-import * as html_to_pdf from 'html-pdf-node'
-import *  as HTMLtoDOCX from "html-to-docx"
+
 import * as path from "path";
 
 export async function export_pdf(args) {
     let options = { format: 'A4' };
     let file = { content: args };
-    return await html_to_pdf.generatePdf(file, options)
+    //return await html_to_pdf.generatePdf(file, options)
+
+    return "false"
 }
 
 export async function export_docx(args: string) {
@@ -17,10 +18,12 @@ export async function export_docx(args: string) {
 
     })*/
 
-    return await HTMLtoDOCX(args, null, {
+   /* return await HTMLtoDOCX(args, null, {
         table: { row: { cantSplit: true } },
         footer: true,
         pageNumber: true,
     });
+*/
 
+    return "false"
 }

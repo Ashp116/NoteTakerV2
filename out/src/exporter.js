@@ -37,19 +37,14 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.export_docx = exports.export_pdf = void 0;
-var html_to_pdf = require("html-pdf-node");
-var HTMLtoDOCX = require("html-to-docx");
 function export_pdf(args) {
     return __awaiter(this, void 0, void 0, function () {
         var options, file;
         return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    options = { format: 'A4' };
-                    file = { content: args };
-                    return [4 /*yield*/, html_to_pdf.generatePdf(file, options)];
-                case 1: return [2 /*return*/, _a.sent()];
-            }
+            options = { format: 'A4' };
+            file = { content: args };
+            //return await html_to_pdf.generatePdf(file, options)
+            return [2 /*return*/, "false"];
         });
     });
 }
@@ -57,21 +52,19 @@ exports.export_pdf = export_pdf;
 function export_docx(args) {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, HTMLtoDOCX(args, null, {
-                        table: { row: { cantSplit: true } },
-                        footer: true,
-                        pageNumber: true,
-                    })];
-                case 1: 
-                /*let imgs = args.match("<img(.*?)>")
-            
-                imgs.forEach((value) => {
-                    let src = value.match(`src="(.*?)"`)[1]
-            
-                })*/
-                return [2 /*return*/, _a.sent()];
-            }
+            /*let imgs = args.match("<img(.*?)>")
+        
+            imgs.forEach((value) => {
+                let src = value.match(`src="(.*?)"`)[1]
+        
+            })*/
+            /* return await HTMLtoDOCX(args, null, {
+                 table: { row: { cantSplit: true } },
+                 footer: true,
+                 pageNumber: true,
+             });
+         */
+            return [2 /*return*/, "false"];
         });
     });
 }

@@ -44,6 +44,7 @@ var fs = require("fs");
 var IPCMain = electron.ipcMain;
 var path = require('path');
 var currentNoteFilePath;
+process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
 function saveNoteFile(args) {
     return __awaiter(this, void 0, void 0, function () {
         var options;
@@ -108,7 +109,8 @@ function createWindow() {
                     return [4 /*yield*/, win.loadURL(path.join(__dirname, "/views/index.html"))];
                 case 1:
                     _a.sent();
-                    if (process.argv[1] !== ".") {
+                    if (process.argv[1] && process.argv[1] !== ".") {
+                        console.log(process.argv);
                         fileContents = fs.readFileSync(process.argv[1]).toString();
                         fileJSON = JSON.parse(fileContents);
                         currentNoteFilePath = process.argv[1];
