@@ -171,6 +171,14 @@ tinymce.PluginManager.add('slashcommands', function (editor) {
             }
         },
         {
+            text: 'Heading 4',
+            icon: 'h4',
+            action: function () {
+                editor.execCommand('mceInsertContent', false, '<h4>Heading 4</h4>');
+                editor.selection.select(editor.selection.getNode());
+            }
+        },
+        {
             type: 'separator'
         },
         {

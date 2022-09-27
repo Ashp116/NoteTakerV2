@@ -50,12 +50,11 @@ async function saveNoteFile(args) {
 
 async function createWindow () {
     const win = new BrowserWindow({
-        minWidth: 800,
-        minHeight: 600,
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
             nodeIntegration: true,
             contextIsolation: false,
+            spellcheck: true
             // devTools: false,
         }
 

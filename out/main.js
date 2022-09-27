@@ -44,7 +44,6 @@ var fs = require("fs");
 var IPCMain = electron.ipcMain;
 var path = require('path');
 var currentNoteFilePath;
-process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
 function saveNoteFile(args) {
     return __awaiter(this, void 0, void 0, function () {
         var options;
@@ -102,6 +101,7 @@ function createWindow() {
                             preload: path.join(__dirname, 'preload.js'),
                             nodeIntegration: true,
                             contextIsolation: false,
+                            spellcheck: true
                             // devTools: false,
                         }
                     });
