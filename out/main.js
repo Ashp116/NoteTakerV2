@@ -95,8 +95,6 @@ function createWindow() {
             switch (_a.label) {
                 case 0:
                     win = new electron_1.BrowserWindow({
-                        minWidth: 800,
-                        minHeight: 600,
                         webPreferences: {
                             preload: path.join(__dirname, 'preload.js'),
                             nodeIntegration: true,
